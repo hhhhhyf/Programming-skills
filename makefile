@@ -9,11 +9,14 @@ percolate.o :percolate.c arralloc.h uni.h
 uni.o : uni.c arralloc.h percolate.h
 		cc -c uni.c
 
-.PHONY: clean
-clean :
-	rm -f *.o *~
+
 run: edit
 	./edit
 .PHONY: all run
 #run:
 #		edit
+
+
+.PHONY: clean
+clean :
+	rm -f *.o *.dat *.pgm

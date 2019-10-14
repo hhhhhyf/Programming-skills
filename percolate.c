@@ -1,53 +1,55 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "arralloc.h"
 #include "uni.h"
 #include "percolate.h"
 
 int main(void)
 {
-    int L;
-    int** map;
-    float rho;
-    int seed;
-    int MAX;
-    char* datafile;
-    char* percfile;
-    char str1[30];
-    char str2[30];
-
-    //L = 20;
+    usercommand();
+    //Initialize i,j,nfill,r and use them to calculate rho and density.
+    int nfill;
+    int i, j;
+    float r;
+    calc_rho_dens(i,j,nfill,r);
+    
+    //Initialize loop,nchange,old to calculate the loop.
+    int loop, nchange, old;
+    calc_loop(loop,nchange,i,j,old);
+    
+    //Initialize itop,ibot,percclusternum to determine whether percolate.
+    int itop, ibot, percclusternum;
+    int percs = 0;
+    ispercolate(percclusternum, itop, ibot, percs);
+    
+    //Initialize a file pointer fp and transfer data to files.
+    FILE *fp;
+    data_to_file(fp,j,i);
+    
+    
+}
+//The function aim to get the figures from users by typing in command line
+void usercommand(){
     printf("Please input the value of L:\n");
     scanf("%d",&L);
     map = (int**)arralloc(sizeof(int), 2, L + 2, L + 2);
-    //rho  = 0.40;
     printf("Please input the value of rho:\n");
     scanf("%f",&rho);
-    //seed = 1564;
     printf("Please input the value of seed:\n");
     scanf("%d",&seed);
-
     printf("Please input the name of datafile:\n");
     scanf("%s",str1);
     printf("Please input the name of PGMfile:\n");
     scanf("%s",str2);
     datafile = str1;
     percfile = str2;
-    //datafile = "map.dat";
-    //percfile = "map.pgm";
-
-
-
     MAX = L * L;
-
     rinit(seed);
-
     printf("Parameters are rho=%f, L=%d, seed=%d\n", rho, L, seed);
+}
 
-    int nfill;
-    int i, j;
-    float r;
+//This function calculates rho and density
+void calc_rho_dens(int i, int j, int nfill,float r){
     for (i = 0; i < L+2; i++)
     {
         for (j = 0; j<L+2; j++)
@@ -70,8 +72,6 @@ int main(void)
     }
     printf("rho = %f, actual density = %f\n",
            rho, 1.0 - ((double) nfill)/((double) L*L) );
-
-    /* Fix bug. */
     nfill = 0;
     for (i = 1; i <= L; i++)
     {
@@ -84,8 +84,9 @@ int main(void)
             }
         }
     }
-
-    int loop, nchange, old;
+}
+//This function calculate the loop
+void calc_loop(int loop, int nchange, int i, int j, int old){
     loop = 1;
     nchange = 1;
     while (nchange > 0)
@@ -112,7 +113,6 @@ int main(void)
         printf("Number of changes on loop %d is %d\n", loop, nchange);
         loop++;
     }
-
     for (j = L; j >= 1; j--)
     {
         for (i = 1;i <= L; i++)
@@ -120,9 +120,9 @@ int main(void)
             map[i][j] = (map[i][j]*1)+0;
         }
     }
-
-    int itop, ibot, percclusternum;
-    int percs = 0;
+}
+//This function determine whether it is percolate
+void ispercolate(int percclusternum, int itop, int ibot, int percs){
     percclusternum = 0;
     for (itop = 1; itop <= L; itop++)
     {
@@ -146,9 +146,10 @@ int main(void)
     {
         printf("Cluster DOES NOT percolate\n");
     }
-
+}
+//This function transfer all the output to .dat file and .pgm file
+void data_to_file(FILE *fp, int j, int i){
     printf("Opening file <%s>\n", datafile);
-    FILE *fp;
     fp = fopen(datafile, "w");
     printf("Writing data ...\n");
     for (j = L; j >= 1; j--)
@@ -162,7 +163,7 @@ int main(void)
     printf("...done\n");
     fclose(fp);
     printf("File closed\n");
-
+    
     int ncluster, maxsize;
     struct cluster *clustlist;
     int colour;
@@ -250,17 +251,17 @@ int main(void)
     free(rank);
     free(map);
 }
-
+//Make comparison to clust
 static int clustcompare(const void *p1, const void *p2)
 {
     int size1, size2, id1, id2;
-
+    
     size1 = ((struct cluster *) p1)->size;
     size2 = ((struct cluster *) p2)->size;
-
+    
     id1   = ((struct cluster *) p1)->id;
     id2   = ((struct cluster *) p2)->id;
-
+    
     if (size1 != size2)
     {
         return(size2 - size1);
