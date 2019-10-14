@@ -1,5 +1,5 @@
 # Programming-skills
-
+-----------------------------
 Assignment refactor:
 Separate for more functions in percolate.c:
 
@@ -9,7 +9,7 @@ void calc_rho_dens(int i, int j, int nfill,float r);
 void calc_loop(int loop, int nchange, int i, int j, int old);
 void ispercolate(int percclusternum, int itop, int ibot, int percs);
 void data_to_file(FILE *fp, int j, int i);
-
+----------------------------
 User instructions:
 1. Use make command to run the script named 'makefile'.
 [s1958683@cirrus-login2 Programming-skills]$ make -f makefile
